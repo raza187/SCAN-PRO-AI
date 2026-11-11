@@ -1,0 +1,32 @@
+workflows:
+  scanpro-android:
+    name: SCAN PRO AI Android Build
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+
+    environment:
+      java: 17
+
+    scripts:
+      - name: Check Android project
+        script: |
+          echo "Checking project files..."
+          ls -la
+          if [ ! -f "gradlew" ]; then
+            echo "ERROR: Gradle wrapper not found in project root"
+            exit 1
+          fi
+
+      - name: Set up Android SDK
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+          chmod +x gradlew
+
+      - name: Build Android APK
+        script: |
+          ./gradlew assembleDebug
+
+    artifacts:
+      - app/build/outputs/apk/**/*.apk
+      - app/build/outputs/**/*.aab
+      - build/reports/**/*.html
